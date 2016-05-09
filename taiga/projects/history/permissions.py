@@ -33,7 +33,7 @@ class IsCommentOwner(PermissionComponent):
         return obj.user and obj.user.get("pk", "not-pk") == request.user.pk
 
 
-class IsCommentProjectOwner(PermissionComponent):
+class IsCommentProjectAdmin(PermissionComponent):
     def check_permissions(self, request, view, obj=None):
         model = get_model_from_key(obj.key)
         pk = get_pk_from_key(obj.key)
@@ -42,23 +42,31 @@ class IsCommentProjectOwner(PermissionComponent):
 
 class UserStoryHistoryPermission(TaigaResourcePermission):
     retrieve_perms = HasProjectPerm('view_project')
-    delete_comment_perms = IsCommentProjectOwner() | IsCommentOwner()
-    undelete_comment_perms = IsCommentProjectOwner() | IsCommentDeleter()
+    edit_comment_perms =  IsCommentProjectAdmin() | IsCommentOwner()
+    delete_comment_perms = IsCommentProjectAdmin() | IsCommentOwner()
+    undelete_comment_perms = IsCommentProjectAdmin() | IsCommentDeleter()
+    comment_versions_perms = IsCommentProjectAdmin() | IsCommentDeleter()
 
 
 class TaskHistoryPermission(TaigaResourcePermission):
     retrieve_perms = HasProjectPerm('view_project')
-    delete_comment_perms = IsCommentProjectOwner() | IsCommentOwner()
-    undelete_comment_perms = IsCommentProjectOwner() | IsCommentDeleter()
+    edit_comment_perms =  IsCommentProjectAdmin() | IsCommentOwner()
+    delete_comment_perms = IsCommentProjectAdmin() | IsCommentOwner()
+    undelete_comment_perms = IsCommentProjectAdmin() | IsCommentDeleter()
+    comment_versions_perms = IsCommentProjectAdmin() | IsCommentDeleter()
 
 
 class IssueHistoryPermission(TaigaResourcePermission):
     retrieve_perms = HasProjectPerm('view_project')
-    delete_comment_perms = IsCommentProjectOwner() | IsCommentOwner()
-    undelete_comment_perms = IsCommentProjectOwner() | IsCommentDeleter()
+    edit_comment_perms =  IsCommentProjectAdmin() | IsCommentOwner()
+    delete_comment_perms = IsCommentProjectAdmin() | IsCommentOwner()
+    undelete_comment_perms = IsCommentProjectAdmin() | IsCommentDeleter()
+    comment_versions_perms = IsCommentProjectAdmin() | IsCommentDeleter()
 
 
 class WikiHistoryPermission(TaigaResourcePermission):
     retrieve_perms = HasProjectPerm('view_project')
-    delete_comment_perms = IsCommentProjectOwner() | IsCommentOwner()
-    undelete_comment_perms = IsCommentProjectOwner() | IsCommentDeleter()
+    edit_comment_perms =  IsCommentProjectAdmin() | IsCommentOwner()
+    delete_comment_perms = IsCommentProjectAdmin() | IsCommentOwner()
+    undelete_comment_perms = IsCommentProjectAdmin() | IsCommentDeleter()
+    comment_versions_perms = IsCommentProjectAdmin() | IsCommentDeleter()
