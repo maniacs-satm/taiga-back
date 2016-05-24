@@ -37,6 +37,7 @@ from taiga.projects.notifications.mixins import WatchedResourceMixin, WatchersVi
 from taiga.projects.history.mixins import HistoryResourceMixin
 from taiga.projects.occ import OCCResourceMixin
 from taiga.projects.models import Project, UserStoryStatus
+from taiga.projects.milestones.models import Milestone
 from taiga.projects.history.services import take_snapshot
 from taiga.projects.votes.mixins.viewsets import VotedResourceMixin, VotersViewSetMixin
 
@@ -255,6 +256,26 @@ class UserStoryViewSet(OCCResourceMixin, VotedResourceMixin, HistoryResourceMixi
     @list_route(methods=["POST"])
     def bulk_update_kanban_order(self, request, **kwargs):
         return self._bulk_update_order("kanban_order", request, **kwargs)
+
+    @list_route(methods=["POST"])
+    def bulk_update_milestone(self, request, **kwargs):
+        serializer = serializers.UpdateMilestoneBulkSerializer(data=request.DATA)
+        if not serializer.is_valid():
+            return response.BadRequest(serializer.errors)
+
+        data = serializer.data
+        project = get_object_or_404(Project, pk=data["project_id"])
+        milestone = get_object_or_404(Milestone, pk=data["milestone_id"])
+
+        self.check_permissions(request, "bulk_update_milestone", project)
+
+        services.update_userstories_milestone_in_bulk(data["bulk_stories"], milestone)
+        services.snapshot_userstories_in_bulk(data["bulk_stories"], request.user)
+
+        return response.NoContent()
+
+
+
 
     @transaction.atomic
     def create(self, *args, **kwargs):
